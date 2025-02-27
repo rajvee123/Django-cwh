@@ -1,0 +1,25 @@
+<h3>Mark Absent for Multiple Days</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <label>Start Date:</label>
+    <input type="date" name="start_date" required>
+
+    <label>Start Meal:</label>
+    <select name="start_meal">
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+    </select>
+
+    <label>End Date:</label>
+    <input type="date" name="end_date" required>
+
+    <label>End Meal:</label>
+    <select name="end_meal">
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+    </select>
+
+    <button type="submit">Mark Absent</button>
+</form>

@@ -1,0 +1,340 @@
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h2>Welcome, {{ student.name }}!</h2>
+    <p>MIS: {{ student.mis }}</p>
+    <p>Email: {{ student.email }}</p>
+    <p>Room No: {{ student.room_no }}</p>
+    <p>Year: {{ student.year }}</p>
+    <p>Branch: {{ student.branch }}</p>
+
+    <a href="{% url 'logout' %}">Logout</a>
+
+    {% if messages %}
+    {% for message in messages %}
+        <p style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+            {{ message }}
+        </p>
+    {% endfor %}
+{% endif %}
+
+    <h3>Mark Absentee</h3>
+
+
+<!-- Mark today's absentee -->
+<form action="{% url 'mark_absent' 'lunch' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Mark Absent for Lunch</button>
+</form>
+
+<form action="{% url 'mark_absent' 'dinner' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Mark Absent for Dinner</button>
+</form>
+
+
+<!-- Undo absence -->
+<h3>Undo Absence</h3>
+
+<form action="{% url 'undo_absent' 'lunch' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Undo Lunch Absence</button>
+</form>
+
+
+
+<form action="{% url 'undo_absent' 'dinner' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Undo Dinner Absence</button>
+</form>
+
+
+<!-- Mark multiple days absentee -->
+<a href="{% url 'mark_multiple_absent' %}">Mark Absent for Multiple Days</a>
+
+</body>
+</html> {% endcomment %}
+
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <h2 class="text-center text-primary">Welcome, {{ student.name }}!</h2>
+
+        <!-- Show Messages -->
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Absentee Limit Tracker -->
+        <div class="text-center mb-4">
+            <h5>You have <span class="text-danger">{{ remaining_absentees }}</span> absences left this month.</h5>
+        </div>
+
+        <!-- Absentee Buttons -->
+        <div class="row text-center">
+            <div class="col-md-6">
+                <form action="{% url 'mark_absent' 'lunch' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100">Mark Absent for Lunch</button>
+                </form>
+                <form action="{% url 'undo_absent' 'lunch' %}" method="POST" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100">Undo Lunch Absence</button>
+                </form>
+            </div>
+
+            <div class="col-md-6">
+                <form action="{% url 'mark_absent' 'dinner' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100">Mark Absent for Dinner</button>
+                </form>
+                <form action="{% url 'undo_absent' 'dinner' %}" method="POST" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100">Undo Dinner Absence</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Multiple Absentee Form -->
+<div class="mt-5">
+    <h4 class="text-center text-primary">Mark Multiple Absences</h4>
+    <form method="POST" action="{% url 'mark_multiple_absent' %}" class="p-3 border rounded bg-white">
+        {% csrf_token %}
+
+        <label><strong>Start Date:</strong></label>
+        <input type="date" name="start_date" class="form-control mb-2" required>
+
+        <label><strong>Start Meal:</strong></label>
+        <select name="start_meal" class="form-control mb-2">
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+        </select>
+
+        <label><strong>End Date:</strong></label>
+        <input type="date" name="end_date" class="form-control mb-2" required>
+
+        <label><strong>End Meal:</strong></label>
+        <select name="end_meal" class="form-control mb-2">
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+        </select>
+
+        <button type="submit" class="btn btn-success w-100">Mark Multiple Absences</button>
+    </form>
+</div>
+
+
+        <!-- Absentee Summary -->
+        <div class="mt-5">
+            <h4 class="text-center text-success">Your Absentee History</h4>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Meal Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in absentee_records %}
+                        <tr>
+                            <td>{{ record.date }}</td>
+                            <td>{{ record.meal_type|title }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center">No absentees marked yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mess Bill Section -->
+<div class="mt-5 text-center">
+    <h4 class="text-success">Your Mess Bill for {{ current_month }}</h4>
+    <h2 class="text-danger">₹{{ mess_bill }}</h2>
+</div>
+
+        <!-- Logout -->
+        <div class="text-center mt-4">
+            <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+        </div>
+    </div>
+
+</body>
+</html> {% endcomment %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .dashboard-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-large {
+            width: 100%;
+            font-size: 18px;
+        }
+        @media (max-width: 768px) {
+            .dashboard-container {
+                width: 90%;
+            }
+            .btn-large {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <h2 class="text-center text-primary">Welcome, {{ student.name }}!</h2>
+
+            <!-- Show Messages -->
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Absentee Limit Tracker -->
+            <div class="text-center mb-4">
+                <h5>You have <span class="text-danger">{{ remaining_absentees }}</span> absences left this month.</h5>
+            </div>
+
+            <!-- Absentee Buttons -->
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <form action="{% url 'mark_absent' 'lunch' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-large">Mark Absent for Lunch</button>
+                    </form>
+                    <form action="{% url 'undo_absent' 'lunch' %}" method="POST" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning btn-large">Undo Lunch Absence</button>
+                    </form>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <form action="{% url 'mark_absent' 'dinner' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-large">Mark Absent for Dinner</button>
+                    </form>
+                    <form action="{% url 'undo_absent' 'dinner' %}" method="POST" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning btn-large">Undo Dinner Absence</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Multiple Absentee Form -->
+            <div class="mt-4">
+                <h4 class="text-center text-primary">Mark Multiple Absences</h4>
+                <form method="POST" action="{% url 'mark_multiple_absent' %}" class="p-3 border rounded bg-white">
+                    {% csrf_token %}
+
+                    <label><strong>Start Date:</strong></label>
+                    <input type="date" name="start_date" class="form-control mb-2" required>
+
+                    <label><strong>Start Meal:</strong></label>
+                    <select name="start_meal" class="form-control mb-2">
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                    </select>
+
+                    <label><strong>End Date:</strong></label>
+                    <input type="date" name="end_date" class="form-control mb-2" required>
+
+                    <label><strong>End Meal:</strong></label>
+                    <select name="end_meal" class="form-control mb-2">
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-success w-100">Mark Multiple Absences</button>
+                </form>
+            </div>
+
+            <!-- Mess Bill Section -->
+            <div class="mt-5 text-center">
+                <h4 class="text-success">Your Mess Bill for {{ current_month }}</h4>
+                <h2 class="text-danger">₹{{ mess_bill }}</h2>
+            </div>
+
+            <!-- Absentee Summary -->
+            <div class="mt-5">
+                <h4 class="text-center text-success">Your Absentee History</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mt-3">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Meal Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in absentee_records %}
+                                <tr>
+                                    <td>{{ record.date }}</td>
+                                    <td>{{ record.meal_type|title }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">No absentees marked yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="text-center mt-4">
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

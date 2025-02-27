@@ -1,0 +1,19 @@
+<h2>Absentee Report for Today</h2>
+
+<h3>Lunch Absentees ({{ lunch_absentees_count }})</h3>
+<ul>
+    {% for record in lunch_absentees %}
+        <li>{{ record.student.name }} (MIS: {{ record.student.mis }})</li>
+    {% empty %}
+        <p>No students marked absent for lunch.</p>
+    {% endfor %}
+</ul>
+
+<h3>Dinner Absentees ({{ dinner_absentees_count }})</h3>
+<ul>
+    {% for record in dinner_absentees %}
+        <li>{{ record.student.name }} (MIS: {{ record.student.mis }})</li>
+    {% empty %}
+        <p>No students marked absent for dinner.</p>
+    {% endfor %}
+</ul>
