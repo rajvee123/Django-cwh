@@ -1,58 +1,100 @@
- 🕷️ Django-cwh
- Web Scraper 
-
-A Django-based web scraping and data tool. The project scrapes web data, processes it, and displays it through a Django web interface.
+# 🍽️ COEP Mess Management System
+> A Django-based internal web tool to digitize hostel mess operations at COEP — reducing paperwork and automating attendance, billing, and menu management.
 
 
- 🛠️ Tech Stack
+## 📌 About
 
-| Layer | Technology |
+This is an internal mess management tool built for COEP's hostel facility. It replaces manual registers and paperwork with a simple web interface where students can mark absentees, check meal prices, and pay their monthly mess bill — all in one place.
+
+> Built with guidance from the [Code With Harry](https://www.youtube.com/@CodeWithHarry) Django series.
+
+---
+
+## ✨ Features
+
+- 🔐 **User Authentication** — Separate login for students and admins
+- ✅ **Absentee Marking** — Students can mark themselves absent for meals
+- 🍛 **Meal Price Checker** — View current meal rates
+- 💸 **Monthly Billing** — Auto-calculated bills based on attendance
+- 📋 **Menu Management** — Admins can update the mess menu
+- 📄 **Paperwork Reduction** — Everything managed digitally, no registers needed
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Tech |
 |---|---|
 | Backend | Python, Django |
 | Frontend | HTML, CSS, SCSS, JavaScript |
 | Database | SQLite (`db.sqlite3`) |
 
-
- 📁 Project Structure
-
-Django-cwh/
-├── home/                      # Main Django app
-├── myproject/                 # Django project settings
-├── venv/                      # Virtual environment
-├── db.sqlite3                 # SQLite database
-├── manage.py                  # Django management script
-├── fix_images.py              # Utility: fix image paths/links
-├── fix_links.py               # Utility: fix broken links
-├── image_update.py            # Utility: update image data
-├── uncomment.py               # Utility script
-└── update_static_tags.py      # Utility: update static file tags
+---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.x
-- pip
-
-### Installation
-
+### 1. Clone the repo
 ```bash
-# Clone the repository
 git clone https://github.com/rajvee123/Django-cwh.git
 cd Django-cwh
+```
 
-# Create and activate virtual environment
+### 2. Create and activate a virtual environment
+```bash
 python -m venv venv
 source venv/bin/activate        # On Windows: venv\Scripts\activate
+```
 
-# Install dependencies
-pip install django
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-# Run migrations
+### 4. Apply migrations
+```bash
 python manage.py migrate
+```
 
-# Start the development server
+### 5. Run the development server
+```bash
 python manage.py runserver
 ```
 
-Open your browser and visit `http://127.0.0.1:8000`
+Visit `http://127.0.0.1:8000` in your browser.
 
+---
+
+## 📁 Project Structure
+
+```
+Django-cwh/
+├── home/               # Main app — views, models, templates
+├── myproject/          # Django project settings & URLs
+├── venv/               # Virtual environment (not tracked)
+├── db.sqlite3          # SQLite database
+├── manage.py           # Django entry point
+├── fix_images.py       # Utility script for image fixes
+├── fix_links.py        # Utility script for link fixes
+├── image_update.py     # Image update helper
+└── update_static_tags.py  # Static tag updater
+```
+
+---
+
+## 👥 Roles & Access
+
+| Feature | Student | Admin |
+|---|:---:|:---:|
+| Login / Logout | ✅ | ✅ |
+| Mark Absentee | ✅ | ✅ |
+| View Meal Prices | ✅ | ✅ |
+| View Monthly Bill | ✅ | ✅ |
+| Manage Billing | ❌ | ✅ |
+| Update Menu | ❌ | ✅ |
+
+---
+
+
+---
+
+*Built at COEP Technological University, Pune. Inspired by the Code With Harry Django series.*
